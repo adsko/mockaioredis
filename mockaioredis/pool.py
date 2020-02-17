@@ -4,7 +4,11 @@ import collections
 import sys
 import warnings
 
-from .commands import MockRedis, create_redis
+try:
+    from .fake_redis import MockRedis, create_redis
+except Exception:
+    from .commands import MockRedis, create_redis
+
 from .util import _NOTSET
 
 

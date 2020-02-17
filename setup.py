@@ -79,5 +79,6 @@ setup(name='mockaioredis',
       extras_require={
         'testing': tests_require,
         'shipping': ['twine'],
+        'fakeredis': ['fakeredis==1.2.1'],
       },
 )
