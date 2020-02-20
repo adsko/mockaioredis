@@ -16,19 +16,26 @@ __all__ = ['MockRedis']
 class WrappedMockRedis(_MockRedis):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._apubsub = defaultdict(Channel)
+        self._apubsub = {}
 
     def publish(self, channel, message):
         super().publish(channel, message)
+        if self._apubsub.get(channel) is None:
+            self._apubsub[channel] = Channel(channel, False)
         self._apubsub[channel].put_nowait(message)
 
     def subscribe(self, channel, *channels):
+        for c in [channel] + channels:
+            if self._apubsub.get(c) is None:
+                self._apubsub[c] = Channel(c, False)
+
         return [self._apubsub[channel].get()] + [self._apubsub[ch].get() for ch in channels]
 
     def unsubscribe(self, *channels):
         for e in channels:
-            self._apubsub[e].close()
-            del self._apubsub[e]
+            if self._apubsub.get(e) is not None:
+                self._apubsub[e].close()
+                del self._apubsub[e]
 
 
 class MockRedis(GenericCommandsMixin, HashCommandsMixin, ListCommandsMixin, SetCommandsMixin, PubSubCommandsMixin):
