@@ -22,7 +22,7 @@ class WrappedMockRedis(_MockRedis):
     def publish(self, channel, message):
         super().publish(channel, message)
         if self._apubsub.get(channel) is None:
-            self._apubsub[channel] = Channel(channel, False)
+            return
         self._apubsub[channel].put_nowait(message)
 
     def subscribe(self, channel, *channels):
