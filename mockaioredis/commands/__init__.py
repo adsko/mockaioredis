@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 
+from aioredis import Channel
 from mockredis import MockRedis as _MockRedis
 
 from .generic import GenericCommandsMixin
@@ -15,7 +16,7 @@ __all__ = ['MockRedis']
 class WrappedMockRedis(_MockRedis):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._apubsub = defaultdict(asyncio.Queue)
+        self._apubsub = defaultdict(Channel)
 
     def publish(self, channel, message):
         super().publish(channel, message)
@@ -26,11 +27,8 @@ class WrappedMockRedis(_MockRedis):
 
     def unsubscribe(self, *channels):
         for e in channels:
-            while True:
-                try:
-                    self._apubsub[e].task_done()
-                except:
-                    break
+            self._apubsub[e].close()
+            del self._apubsub[e]
 
 
 class MockRedis(GenericCommandsMixin, HashCommandsMixin, ListCommandsMixin, SetCommandsMixin, PubSubCommandsMixin):
