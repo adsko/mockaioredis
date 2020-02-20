@@ -25,7 +25,7 @@ class WrappedMockRedis(_MockRedis):
         self._apubsub[channel].put_nowait(message)
 
     def subscribe(self, channel, *channels):
-        for c in [channel] + channels:
+        for c in [channel] + list(channels):
             if self._apubsub.get(c) is None:
                 self._apubsub[c] = Channel(c, False)
 
