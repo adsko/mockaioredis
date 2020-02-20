@@ -7,3 +7,6 @@ class PubSubCommandsMixin(PubSubCommandsMixin_):
 
     async def subscribe(self, channel, *channels):
         return self._redis.subscribe(channel, *channels)
+
+    async def unsubscribe(self, channel, *channels):
+        return self._redis.unsubscribe(channels, *channels)

@@ -11,6 +11,7 @@ from .set import SetCommandsMixin
 
 __all__ = ['MockRedis']
 
+
 class WrappedMockRedis(_MockRedis):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,6 +23,14 @@ class WrappedMockRedis(_MockRedis):
 
     def subscribe(self, channel, *channels):
         return [self._apubsub[channel].get()] + [self._apubsub[ch].get() for ch in channels]
+
+    def unsubscribe(self, *channels):
+        for e in channels:
+            while True:
+                try:
+                    self._apubsub[e].task_done()
+                except:
+                    break
 
 
 class MockRedis(GenericCommandsMixin, HashCommandsMixin, ListCommandsMixin, SetCommandsMixin, PubSubCommandsMixin):
