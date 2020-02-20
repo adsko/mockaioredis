@@ -30,7 +30,7 @@ class WrappedMockRedis(_MockRedis):
             if self._apubsub.get(c) is None:
                 self._apubsub[c] = Channel(c, False)
 
-        return [self._apubsub[channel].get()] + [self._apubsub[ch].get() for ch in channels]
+        return [self._apubsub[channel]] + [self._apubsub[ch] for ch in channels]
 
     def unsubscribe(self, *channels):
         for e in channels:
