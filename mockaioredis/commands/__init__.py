@@ -1,4 +1,5 @@
 import asyncio
+import itertools
 from collections import defaultdict
 
 from aioredis import Channel
@@ -25,7 +26,7 @@ class WrappedMockRedis(_MockRedis):
         self._apubsub[channel].put_nowait(message)
 
     def subscribe(self, channel, *channels):
-        for c in [channel] + list(channels):
+        for c in itertools.chain([channel], channels):
             if self._apubsub.get(c) is None:
                 self._apubsub[c] = Channel(c, False)
 
